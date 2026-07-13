@@ -1,0 +1,7 @@
+﻿node_modules/
+.env
+*.log
+test_*.js
+deploy.js
+.git/
+.DS_Store
