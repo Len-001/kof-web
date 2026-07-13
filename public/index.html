@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页拳皇 - 在线格斗</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== 登录视图 ===== -->
+<div id="login-view" class="view active">
+  <div class="login-card">
+    <h1>🥊 网页拳皇</h1>
+    <p class="subtitle">在线多人 P2P 格斗</p>
+    <div class="form-group">
+      <label>输入昵称</label>
+      <input type="text" id="nickname-input" maxlength="12" placeholder="你的格斗大名">
+    </div>
+    <div class="form-group">
+      <label>服务器地址</label>
+      <input type="text" id="server-url" value="ws://localhost:3000" placeholder="ws://localhost:3000">
+    </div>
+    <button id="connect-btn" class="btn btn-primary">连接服务器</button>
+    <p id="connect-status" class="status-text">等待连接...</p>
+  </div>
+</div>
+
+<!-- ===== 大厅视图 ===== -->
+<div id="lobby-view" class="view">
+  <div class="lobby-header">
+    <h2>🏟️ 房间大厅</h2>
+    <span id="lobby-nickname" class="nickname-badge"></span>
+    <button id="logout-btn" class="btn btn-small">断开</button>
+  </div>
+  <div class="lobby-actions">
+    <button id="create-room-btn" class="btn btn-primary">创建房间</button>
+    <div id="create-room-form" class="hidden">
+      <input type="text" id="room-name-input" placeholder="房间名称" maxlength="20">
+      <select id="room-max-input">
+        <option value="2">2人</option>
+        <option value="3">3人</option>
+        <option value="4" selected>4人</option>
+      </select>
+      <button id="confirm-create-btn" class="btn btn-small">确认创建</button>
+      <button id="cancel-create-btn" class="btn btn-small btn-secondary">取消</button>
+    </div>
+  </div>
+  <table class="room-table">
+    <thead><tr><th>房间名</th><th>人数</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody id="room-list-body"></tbody>
+  </table>
+  <p id="room-list-empty" class="hint">暂无房间，创建一个吧！</p>
+</div>
+
+<!-- ===== 房间视图 ===== -->
+<div id="room-view" class="view">
+  <div class="room-header">
+    <h2 id="room-name-display">房间</h2>
+    <span id="room-id-display" class="room-id"></span>
+    <button id="leave-room-btn" class="btn btn-small btn-secondary">离开房间</button>
+  </div>
+  <div class="room-content">
+    <div class="player-list-section">
+      <h3>玩家列表 <span id="player-count"></span></h3>
+      <ul id="player-list"></ul>
+    </div>
+    <div class="room-actions-section">
+      <div class="form-group">
+        <label>上传角色皮肤</label>
+        <input type="file" id="skin-upload" accept="image/png,image/jpeg">
+        <div id="skin-preview" class="skin-preview"></div>
+      </div>
+      <button id="ready-btn" class="btn btn-large btn-ready">准备</button>
+      <button id="start-game-btn" class="btn btn-large btn-primary hidden">开始游戏</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 游戏视图 ===== -->
+<div id="game-view" class="view">
+  <canvas id="game-canvas"></canvas>
+  <div id="game-hud" class="game-hud hidden">
+    <div id="hud-timer" class="hud-timer">60</div>
+    <div id="hud-round" class="hud-round">ROUND 1</div>
+    <div id="hud-players" class="hud-players"></div>
+  </div>
+  <div id="game-overlay" class="game-overlay hidden">
+    <div id="overlay-content"></div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
