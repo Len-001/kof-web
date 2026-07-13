@@ -1,4 +1,4 @@
-import { CONFIG } from './config.js';
+﻿import { CONFIG } from './config.js';
 import { Fighter, STATE } from './fighter.js';
 import { InputManager } from './input.js';
 import { Physics } from './physics.js';
@@ -18,6 +18,8 @@ export class GameEngine {
     this.skinManager = null;
 
     this.fighters = [];
+    this.localSlot = 0;
+    this.isHost = true;
     this.localPlayerId = null;
     this.frame = 0;
     this.running = false;
@@ -35,17 +37,16 @@ export class GameEngine {
     this.lastTimestamp = 0;
     this.inputAccumulator = 0;
 
-    // 投影物
-    this.projectiles = [];
+    // 鎶曞奖鐗?    this.projectiles = [];
 
-    // 倒计时状态
-    this.countdown = 0;
+    // 鍊掕鏃剁姸鎬?    this.countdown = 0;
     this.countdownText = '';
   }
 
-  // 初始化游戏
-  init(players, localPlayerId, p2pManager, skinManager) {
-    this.localPlayerId = localPlayerId;
+  // 鍒濆鍖栨父鎴?  init(players, localSlot, p2pManager, skinManager, isHost) {
+    this.localSlot = localSlot;
+    this.isHost = isHost;
+    this.localPlayerId = localSlot === 0 ? "host" : "joiner";
     this.p2p = p2pManager;
     this.skinManager = skinManager;
     this.fighters = [];
@@ -55,7 +56,7 @@ export class GameEngine {
     this.gameResults = [];
     this.projectiles = [];
 
-    // 创建角色
+    // 鍒涘缓瑙掕壊
     players.forEach((p, i) => {
       const pos = Physics.getStartPosition(i, players.length);
       const fighter = new Fighter({
@@ -72,22 +73,20 @@ export class GameEngine {
     this.combat.reset();
     this.effects.reset();
     this.renderer.effects.reset();
-    this.countdown = 120; // 2秒倒计时
-    this.countdownText = '';
+    this.countdown = 120; // 2绉掑€掕鏃?    this.countdownText = '';
     this.roundInProgress = false;
     this.roundTimer = CONFIG.ROUND_TIME;
 
     this._updateHUD();
   }
 
-  // 开始游戏循环
-  start() {
+  // 寮€濮嬫父鎴忓惊鐜?  start() {
     this.running = true;
     this.lastTimestamp = performance.now();
     this.animFrameId = requestAnimationFrame((t) => this._gameLoop(t));
   }
 
-  // 停止游戏
+  // 鍋滄娓告垙
   stop() {
     this.running = false;
     if (this.animFrameId) {
@@ -111,8 +110,7 @@ export class GameEngine {
   }
 
   _update(dt) {
-    // 倒计时阶段
-    if (this.countdown > 0) {
+    // 鍊掕鏃堕樁娈?    if (this.countdown > 0) {
       this.countdown--;
       const secs = Math.ceil(this.countdown / 60);
       if (secs > 0 && secs <= 3) {
@@ -123,7 +121,7 @@ export class GameEngine {
           this.roundInProgress = true;
         }
       }
-      // 倒计时期间仍然更新物理（位置已重置）
+      // 鍊掕鏃舵湡闂翠粛鐒舵洿鏂扮墿鐞嗭紙浣嶇疆宸查噸缃級
       for (const f of this.fighters) {
         if (f.alive) f.update(dt);
       }
@@ -134,47 +132,40 @@ export class GameEngine {
 
     if (!this.roundInProgress) return;
 
-    // 1. 获取本地输入
+    // 1. 鑾峰彇鏈湴杈撳叆
     const localInput = this.inputManager.update();
 
-    // 2. 广播输入到对手
-    if (this.p2p) {
-      this.p2p.broadcastInput(localInput);
+    // 2. 骞挎挱杈撳叆鍒板鎵?    if (this.p2p) {
+      
     }
 
-    // 3. 处理所有输入
-    this._processInputs(localInput, dt);
+    // 3. 澶勭悊鎵€鏈夎緭鍏?    this._processInputs(localInput, dt);
 
-    // 4. 更新所有角色
-    for (const f of this.fighters) {
+    // 4. 鏇存柊鎵€鏈夎鑹?    for (const f of this.fighters) {
       if (f.alive) f.update(dt);
     }
 
-    // 5. 处理攻击碰撞
+    // 5. 澶勭悊鏀诲嚮纰版挒
     this.combat.processAttacks(this.fighters, this.frame);
 
-    // 6. 处理远程飞行道具
+    // 6. 澶勭悊杩滅▼椋炶閬撳叿
     this._updateProjectiles(dt);
 
-    // 7. 检测连击特效
-    this._processHitEffects();
+    // 7. 妫€娴嬭繛鍑荤壒鏁?    this._processHitEffects();
 
-    // 8. 更新粒子
+    // 8. 鏇存柊绮掑瓙
     this.effects.update(dt);
 
-    // 9. 更新计时器
-    this._updateTimer(dt);
+    // 9. 鏇存柊璁℃椂鍣?    this._updateTimer(dt);
 
-    // 10. 检查回合结束
-    this._checkRoundEnd();
+    // 10. 妫€鏌ュ洖鍚堢粨鏉?    this._checkRoundEnd();
 
-    // 11. 更新 HUD
+    // 11. 鏇存柊 HUD
     this._updateHUD();
   }
 
   _processInputs(localInput, dt) {
-    // 收集所有输入
-    const allInputs = {};
+    // 鏀堕泦鎵€鏈夎緭鍏?    const allInputs = {};
     allInputs[this.localPlayerId] = this.inputManager.applyRemoteInput(localInput);
 
     if (this.p2p) {
@@ -189,22 +180,20 @@ export class GameEngine {
       }
     }
 
-    // 应用输入到每个角色
-    for (const f of this.fighters) {
+    // 搴旂敤杈撳叆鍒版瘡涓鑹?    for (const f of this.fighters) {
       if (!f.alive) continue;
       const input = allInputs[f.id];
       if (!input) continue;
 
-      // 不处于可行动状态
-      if (f.state === STATE.HIT || f.state === STATE.DOWN || f.state === STATE.DEAD) continue;
+      // 涓嶅浜庡彲琛屽姩鐘舵€?      if (f.state === STATE.HIT || f.state === STATE.DOWN || f.state === STATE.DEAD) continue;
       if (f.stateTimer > 0 && f.state !== STATE.WALK && f.state !== STATE.JUMP && f.state !== STATE.IDLE && f.state !== STATE.GUARD) continue;
 
       const speedMul = f.getSpeedMultiplier();
 
-      // 防御
+      // 闃插尽
       f.guarding = input.guard > 0 && input.horizontal === 0 && input.light === 0 && input.heavy === 0 && input.kick === 0;
 
-      // 移动
+      // 绉诲姩
       if (input.horizontal !== 0 && !f.guarding) {
         f.vx = input.horizontal * CONFIG.MOVE_SPEED * speedMul;
         f.facing = input.horizontal > 0 ? 1 : -1;
@@ -213,19 +202,19 @@ export class GameEngine {
         f.state = STATE.IDLE;
       }
 
-      // 跳跃
+      // 璺宠穬
       if (input.vertical < 0 && f.y >= CONFIG.GROUND_Y - 1 && f.state !== STATE.JUMP) {
         f.vy = CONFIG.JUMP_SPEED * speedMul;
         f.state = STATE.JUMP;
       }
 
-      // 冲刺
+      // 鍐插埡
       if (input.dash && f.state === STATE.IDLE) {
         f.vx = input.dash === 'right' ? CONFIG.MOVE_SPEED * 1.5 : -CONFIG.MOVE_SPEED * 1.5;
         f.state = STATE.WALK;
       }
 
-      // 攻击
+      // 鏀诲嚮
       if (!f.guarding) {
         if (input.combo) {
           this._executeSpecial(f, input.combo);
@@ -238,7 +227,7 @@ export class GameEngine {
         }
       }
 
-      // 爆气
+      // 鐖嗘皵
       if (input.rage > 0 && !f.rageActive && f.rage >= f.maxRage) {
         this._activateRage(f);
       }
@@ -294,7 +283,7 @@ export class GameEngine {
     fighter.canAct = false;
 
     if (move.type === 'projectile') {
-      // 发射飞行道具
+      // 鍙戝皠椋炶閬撳叿
       this.projectiles.push({
         x: fighter.x + fighter.facing * 30,
         y: fighter.y - 25,
@@ -310,7 +299,7 @@ export class GameEngine {
       });
       this.effects.addHitSpark(fighter.x + fighter.facing * 30, fighter.y - 25, '#4fc3f7');
     } else {
-      // 近身特殊技
+      // 杩戣韩鐗规畩鎶€
       fighter.activeHitbox = {
         offsetX: fighter.facing * 40,
         offsetY: -fighter.height / 2 - 10,
@@ -335,10 +324,9 @@ export class GameEngine {
 
   _activateRage(fighter) {
     fighter.rageActive = true;
-    fighter.rageTimer = 480; // 8秒
-    fighter.rage = 0;
+    fighter.rageTimer = 480; // 8绉?    fighter.rage = 0;
     this.effects.addRageBurst(fighter.x, fighter.y - 30, fighter.color);
-    this.effects.addFloatingText(fighter.x, fighter.y - 80, '爆气!', '#ff4444');
+    this.effects.addFloatingText(fighter.x, fighter.y - 80, '鐖嗘皵!', '#ff4444');
   }
 
   _updateProjectiles(dt) {
@@ -347,8 +335,7 @@ export class GameEngine {
       p.x += p.vx * dt;
       p.life--;
 
-      // 检查碰撞
-      for (const f of this.fighters) {
+      // 妫€鏌ョ鎾?      for (const f of this.fighters) {
         if (f.id === p.ownerId || !f.alive) continue;
         if (f.invincibleTimer > 0) continue;
 
@@ -365,7 +352,7 @@ export class GameEngine {
         }
       }
 
-      // 超出范围
+      // 瓒呭嚭鑼冨洿
       if (p.life <= 0 || p.x < -50 || p.x > CONFIG.WORLD_WIDTH + 50) {
         this.projectiles.splice(i, 1);
       }
@@ -377,7 +364,7 @@ export class GameEngine {
       this.effects.addHitSpark(hit.x, hit.y, '#ffdf00');
       this.effects.addFloatingText(hit.x + 10, hit.y - 10, '-' + hit.damage, '#ff4444');
 
-      // 检查击杀
+      // 妫€鏌ュ嚮鏉€
       const target = this.fighters.find(f => f.id === hit.targetId);
       if (target && !target.alive) {
         this.eliminationCount++;
@@ -408,7 +395,7 @@ export class GameEngine {
     this.roundInProgress = false;
 
     if (!winner) {
-      // 时间到，找HP最高的
+      // 鏃堕棿鍒帮紝鎵綡P鏈€楂樼殑
       let maxHp = -1;
       for (const f of this.fighters) {
         if (f.hp > maxHp) { maxHp = f.hp; winner = f; }
@@ -420,8 +407,7 @@ export class GameEngine {
       this.roundWinner = winner;
     }
 
-    // 检查比赛胜利
-    let matchWinner = null;
+    // 妫€鏌ユ瘮璧涜儨鍒?    let matchWinner = null;
     for (const f of this.fighters) {
       if (f.wins >= CONFIG.WINS_NEEDED) {
         matchWinner = f;
@@ -434,7 +420,7 @@ export class GameEngine {
       this._buildResults();
       if (this.onMatchEnd) this.onMatchEnd(matchWinner, this.gameResults);
     } else {
-      // 下一回合
+      // 涓嬩竴鍥炲悎
       setTimeout(() => this._startNextRound(), 2000);
     }
   }
@@ -447,14 +433,13 @@ export class GameEngine {
     this.combat.reset();
     this.projectiles = [];
 
-    // 重置存活玩家的位置
-    const alivePlayers = this.fighters.filter(f => f.alive);
+    // 閲嶇疆瀛樻椿鐜╁鐨勪綅缃?    const alivePlayers = this.fighters.filter(f => f.alive);
     alivePlayers.forEach((f, i) => {
       const pos = Physics.getStartPosition(f.playerIndex, this.fighters.length);
       f.resetPosition(pos.x, pos.y, pos.facing);
     });
 
-    // 死亡玩家重置但标记不活跃
+    // 姝讳骸鐜╁閲嶇疆浣嗘爣璁颁笉娲昏穬
     this.fighters.filter(f => !f.alive).forEach(f => {
       f.resetMatch();
       const pos = Physics.getStartPosition(f.playerIndex, this.fighters.length);
@@ -468,8 +453,7 @@ export class GameEngine {
   }
 
   _buildResults() {
-    // 按胜场排序
-    const sorted = [...this.fighters].sort((a, b) => b.wins - a.wins || (a.alive ? -1 : 1) || a.eliminationOrder - b.eliminationOrder);
+    // 鎸夎儨鍦烘帓搴?    const sorted = [...this.fighters].sort((a, b) => b.wins - a.wins || (a.alive ? -1 : 1) || a.eliminationOrder - b.eliminationOrder);
     this.gameResults = sorted.map((f, i) => ({
       rank: i + 1,
       nickname: f.nickname,
@@ -504,7 +488,7 @@ export class GameEngine {
       el.className = 'hud-player';
       const hpPct = Math.max(0, (f.hp / f.maxHp) * 100);
       el.innerHTML = `
-        <span class="player-label" style="color:${f.color}">${f.nickname} ${!f.alive ? '💀' : ''} [${f.wins}]</span>
+        <span class="player-label" style="color:${f.color}">${f.nickname} ${!f.alive ? '馃拃' : ''} [${f.wins}]</span>
         <div class="hp-bar-bg">
           <div class="hp-bar" style="width:${hpPct}%;background:${hpPct > 50 ? '#4ade80' : hpPct > 25 ? '#fbbf24' : '#e94560'}"></div>
         </div>
@@ -519,8 +503,7 @@ export class GameEngine {
   _render() {
     this.renderer.render(this.fighters, this.skinManager, this.frame);
 
-    // 额外渲染：飞行道具
-    const ctx = this.renderer.ctx;
+    // 棰濆娓叉煋锛氶琛岄亾鍏?    const ctx = this.renderer.ctx;
     const w = ctx.canvas.width;
     const h = ctx.canvas.height;
     const scale = this.renderer.scale;
@@ -545,3 +528,4 @@ export class GameEngine {
 }
 
 export default GameEngine;
+

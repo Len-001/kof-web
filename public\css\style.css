@@ -216,3 +216,36 @@ body {
   .room-table th, .room-table td { padding: 8px 10px; font-size: 12px; }
   .hud-timer { font-size: 24px; }
 }
+/* ===== Code Card ===== */
+.code-card {
+  max-width: 500px; margin: 40px auto; padding: 30px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 16px; border: 1px solid #e94560;
+  box-shadow: 0 0 40px rgba(233,69,96,0.3);
+  text-align: center;
+}
+.code-card h2 { font-size: 24px; margin-bottom: 8px; }
+.code-card .subtitle { color: #888; margin-bottom: 16px; font-size: 14px; }
+.code-box {
+  background: #0a0a1a; padding: 16px; border-radius: 10px;
+  border: 1px solid #333; margin: 12px 0;
+  font-family: monospace; font-size: 12px; word-break: break-all;
+  color: #4ade80; line-height: 1.5; user-select: all;
+  max-height: 120px; overflow-y: auto;
+}
+#home-view .btn-group { display: flex; gap: 12px; }
+#home-view .btn-group .btn { flex: 1; margin-top: 0; }
+#home-view .btn-group .btn-primary { background: #e94560; }
+#home-view .btn-group .btn-secondary { background: #333; color: #ccc; }
+textarea#room-code-input {
+  width: 100%; padding: 10px; background: #0a0a1a; border: 1px solid #333;
+  border-radius: 8px; color: #4ade80; font-family: monospace; font-size: 12px;
+  outline: none; resize: none;
+}
+textarea#room-code-input:focus { border-color: #e94560; }
+#join-code-input {
+  width: 100%; padding: 10px; background: #0a0a1a; border: 1px solid #333;
+  border-radius: 8px; color: #4ade80; font-family: monospace; font-size: 12px;
+  outline: none;
+}
+#join-code-input:focus { border-color: #e94560; }

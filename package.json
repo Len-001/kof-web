@@ -1,13 +1,5 @@
 {
   "name": "kof-web",
   "version": "1.0.0",
-  "description": "网页在线拳皇 - 多人 P2P 格斗游戏",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
-  },
-  "dependencies": {
-    "ws": "^8.16.0"
-  }
+  "description": "网页拳皇 - 纯P2P在线格斗"
 }

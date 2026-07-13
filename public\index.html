@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页拳皇 - 纯P2P格斗</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== HOME ===== -->
+<div id="home-view" class="view active">
+  <div class="login-card">
+    <h1>🥊 网页拳皇</h1>
+    <p class="subtitle">纯P2P在线格斗 · 无需服务器</p>
+    <div class="form-group">
+      <label>输入昵称</label>
+      <input type="text" id="nickname-input" maxlength="12" placeholder="你的格斗大名">
+    </div>
+    <div class="btn-group">
+      <button id="host-btn" class="btn btn-primary">创建房间</button>
+      <button id="join-btn" class="btn btn-secondary">加入房间</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HOST VIEW ===== -->
+<div id="host-view" class="view">
+  <div class="code-card">
+    <h2>🎮 你创建了房间</h2>
+    <p class="subtitle">将此房间码发给朋友</p>
+    <div id="room-code-box" class="code-box">生成中...</div>
+    <button id="copy-code-btn" class="btn btn-primary">📋 复制房间码</button>
+    <p id="host-status" class="status-text">等待朋友连接...</p>
+    <div id="host-join-input" class="hidden" style="margin-top: 16px;">
+      <label>朋友发回了连接码，粘贴在这里:</label>
+      <input type="text" id="join-code-input" placeholder="粘贴连接码">
+      <button id="accept-join-btn" class="btn btn-primary" style="margin-top:8px">确认连接</button>
+    </div>
+    <div id="host-connected" class="hidden" style="margin-top: 16px;">
+      <p style="color:#4ade80;font-size:18px">✅ <span id="joiner-name"></span> 已连接!</p>
+      <button id="start-game-btn" class="btn btn-large btn-primary" style="margin-top:16px">开始游戏</button>
+    </div>
+    <button id="cancel-host-btn" class="btn btn-small btn-secondary" style="margin-top:16px">取消</button>
+  </div>
+</div>
+
+<!-- ===== JOIN VIEW ===== -->
+<div id="join-view" class="view">
+  <div class="code-card">
+    <h2>🔗 加入房间</h2>
+    <p class="subtitle">从房主那里获取房间码</p>
+    <div class="form-group">
+      <label>粘贴房间码</label>
+      <textarea id="room-code-input" rows="3" placeholder="粘贴房主给你的房间码"></textarea>
+    </div>
+    <button id="join-room-btn" class="btn btn-primary">加入</button>
+    <p id="join-status" class="status-text"></p>
+    <div id="join-result" class="hidden" style="margin-top: 16px;">
+      <label>将下面的连接码发给房主:</label>
+      <div id="join-code-box" class="code-box">生成中...</div>
+      <button id="copy-join-btn" class="btn btn-primary">📋 复制连接码</button>
+      <p id="join-wait-status" class="status-text">已发送，等待房主确认...</p>
+    </div>
+    <button id="cancel-join-btn" class="btn btn-small btn-secondary" style="margin-top:16px">取消</button>
+  </div>
+</div>
+
+<!-- ===== SKIN UPLOAD (shown before game) ===== -->
+<div id="skin-view" class="view">
+  <div class="code-card">
+    <h2>🎨 上传角色皮肤</h2>
+    <p class="subtitle">可选 - 选择图片作为角色形象</p>
+    <input type="file" id="skin-upload" accept="image/png,image/jpeg">
+    <div id="skin-preview" class="skin-preview"></div>
+    <button id="done-btn" class="btn btn-primary" style="margin-top:16px">准备好了，开始游戏!</button>
+    <button id="skip-skin-btn" class="btn btn-small btn-secondary">跳过，使用默认形象</button>
+  </div>
+</div>
+
+<!-- ===== GAME VIEW ===== -->
+<div id="game-view" class="view">
+  <canvas id="game-canvas"></canvas>
+  <div id="game-hud" class="game-hud hidden">
+    <div id="hud-timer" class="hud-timer">60</div>
+    <div id="hud-round" class="hud-round">ROUND 1</div>
+    <div id="hud-players" class="hud-players"></div>
+  </div>
+  <div id="game-overlay" class="game-overlay hidden">
+    <div id="overlay-content"></div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
